@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.moxi.dao.user.IUserDao" >
+	
+	<!-- 查询用户 -->
+	<select id="checkUserPhoneNumberExsit" resultType="User">
+		SELECT * FROM app_v2_user WHERE phoneNumber = #{phoneNumber}
+	</select>
+	
+	<!-- 根据userId查询用户 -->
+	<select id="checkUserByUserId" resultType="User">
+		SELECT * FROM app_v2_user WHERE id = #{userId}
+	</select>
+	
+	<!-- 更新用户信息 -->
+	<update id="updateUserinfo" parameterType="com.moxi.model.User">
+	    UPDATE  app_v2_user
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(phoneNumber)">phoneNumber = #{phoneNumber},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(username)">username = #{username},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(password)">password = #{password},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(score)">score = #{score},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(imgPath)">imgPath = #{imgPath},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(userSign)">userSign = #{userSign},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(isLogin)">isLogin = #{isLogin},</if>
+		</trim>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 保存验证码 -->
+	<select id="savePhoneSendCode"  parameterType="com.moxi.model.PhoneCode" >
+	  insert app_phonecode (phonenumber,code,createtime)
+                  values (#{phonenumber},#{code}, #{createtime})
+	</select>
+	
+	<!-- 检查当前电话号码是否已经注册过 -->
+	<select id="checkCode"  parameterType="com.moxi.model.PhoneCode"   resultType="com.moxi.model.PhoneCode" >
+	  select * from app_phonecode where  phonenumber=#{phonenumber} and  code=#{code}  and   createtime=#{createtime} ;
+	</select>
+	
+	<!-- 检查用户名是否存在 -->
+	<select id="checkUserNameExsit" resultType="User">
+	  select * from app_v2_user where  username=#{username};
+	</select>
+	
+	<!-- 用户注册接口 -->
+	<select id="saveUser"  parameterType="com.moxi.model.User" >
+	   INSERT INTO app_v2_user (
+			phoneNumber,
+			username,
+			password,
+			score,
+			imgPath,
+			userSign,
+			isLogin
+		)
+		VALUES(
+			#{phoneNumber},
+			#{username},
+			#{password},
+			#{score},
+			#{imgPath},
+			#{userSign},
+			#{isLogin}
+		)
+	</select>
+	
+	<!-- 保存token -->
+	<select id="saveToken"  parameterType="com.moxi.model.User" >
+	   INSERT INTO app_v2_token (phoneNumber, token, userId)
+	   VALUES(
+		#{phoneNumber},
+		#{token},
+		#{userId}
+	   )
+	</select>
+	
+	<!-- 拿到注册信息 -->
+	<select id="getRegisterInfo"  resultType="java.util.Map" >
+	    SELECT
+			avu.username as username,
+			avu.score as score,
+			avu.id as userId,
+			avt.token as token,
+			avu.isLogin as isLogin,
+			avu.userSign userSign
+		FROM
+			app_v2_user avu
+		LEFT JOIN app_v2_token avt ON avu.id = avt.userId
+		WHERE
+			avu.id = #{userId}
+	</select>
+	
+	<!-- 拿到token信息 -->
+	<select id="getTokenInfo" resultType="Token">
+		SELECT * FROM app_v2_token WHERE userId = #{userId}
+	</select>
+	
+	<!-- 更新token信息 -->
+	<select id="updateTokenInfo" parameterType="com.moxi.model.Token">
+		UPDATE app_v2_token SET token = #{token} WHERE userId = #{userId} 
+	</select>
+	
+</mapper>

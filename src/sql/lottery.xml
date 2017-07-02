@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.moxi.dao.lottery.ILotteryDao" >
+
+	<!-- 删除某种彩票类型的中奖信息 -->
+	<select id="deleteLotteryRecord" parameterType="java.util.Map">
+		delete from app_lottery_results where type=#{type}
+	</select>
+	
+	<!-- 保存中奖信息 -->
+	<select id="saveLotteryPoJo" parameterType="com.moxi.model.LotteryPoJo">
+		INSERT app_lottery_results (
+			qihao,
+			dateline,
+			number,
+			type,
+			createtime,
+			syscreatetime
+		)
+		VALUES(
+			#{qihao},#{dateline},
+			#{number},#{type},#{createtime},#{syscreatetime}
+		)
+	</select>
+	
+</mapper>

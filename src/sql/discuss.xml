@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.moxi.dao.discuss.IDiscussDao" >
+
+	<!-- 保存新闻评论 -->
+	<insert id="saveNewsDiscuss" parameterType="com.moxi.model.Discuss">
+		INSERT INTO app_v2_discuss (userId, content, newsId)
+		VALUES(
+			#{userId}, 
+			#{content},
+			#{newsId}
+		)
+	</insert>
+	
+	<!-- 查询新闻对应的所有评论 -->
+	<select id="findAllDiscuss" resultType="java.util.Map">
+		SELECT
+			b.id as userId,
+			b.username,
+			b.imgPath,
+			a.content,
+			a.createTime
+		FROM
+			app_v2_discuss a
+		LEFT JOIN app_v2_user b ON a.userId = b.id
+		WHERE
+			a.newsId = #{newsId}
+	</select>
+	
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.moxi.dao.news.INewsDao" >
+
+	<!-- 查询新闻一览 -->
+	<select id="findNews" resultType="java.util.Map" parameterType="com.moxi.model.AppParams">
+		SELECT
+			t.Id as newsId,
+			t.title,
+			t.registertime,
+			t.readCount,
+			t.imageurl,
+			a.newsType
+		FROM
+			app_news t
+		LEFT JOIN app_v2_news_type a ON t.typeId = a.id
+		ORDER BY
+			t.registertime DESC
+		LIMIT #{pageNo},#{pageSize}
+	</select>
+	
+	
+	<!-- 查询新闻明细 -->
+	<select id="getNews" resultType="java.util.Map">
+		SELECT
+			t.Id as newsId,
+			t.title,
+			t.registertime,
+			t.readCount,
+			t.imageurl,
+			t.commentCount,
+			t.totalHit,
+			t.description as newsContent,
+			a.newsType
+		FROM
+			app_news t
+		LEFT JOIN app_v2_news_type a ON t.typeId = a.id
+		WHERE
+			t.Id = #{newsId}
+	</select>
+	
+	
+	<!-- 查询新闻明细2 -->
+	<select id="getNewsById" resultType="News">
+		SELECT
+			Id,
+			title,
+			registertime,
+			`status`,
+			imageurl,
+			description,
+			totalHit,
+			readCount,
+			commentCount
+		FROM
+			app_news
+		WHERE
+			Id = #{newsId}
+	</select>
+	
+	
+	<!-- 查询是否点赞 -->
+	<select id="getNewsThumbs" resultType="NewsThumbs">
+		SELECT
+			*
+		FROM
+			app_v2_news_thumbs
+		WHERE
+			userId = #{userId}
+		AND newsId = #{newsId}
+	</select>
+	
+	<!-- 更新新闻信息 -->
+	<update id="updateNewsinfo" parameterType="com.moxi.model.News">
+	    UPDATE  app_news
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(totalHit)">totalHit = #{totalHit},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(readCount)">readCount = #{readCount},</if>
+			<if test="@com.moxi.util.TmStringUtils@isNotEmpty(commentCount)">commentCount = #{commentCount},</if>
+		</trim>
+		WHERE Id = #{Id}
+	</update>
+	
+</mapper>
